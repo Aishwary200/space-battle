@@ -6,7 +6,7 @@ var bulletImg;
 var enemyGroup;
 var eBulletGroup, pBulletGroup;
 var chances = 2;
-var p1 = true, p2 = false, p3 = false
+var p1 = true, p2 = false, p3 = false, p4 = false
 var gameState = "start";
 var blast;
 var pbulletImg, eBulletImg;
@@ -59,6 +59,7 @@ function setup() {
 
   userInterface = new UserInterface()
   userInterface.display()
+  pause = new Pause()
 }
 function draw() {
   if (gameState === "start") {
@@ -70,6 +71,7 @@ function draw() {
   }
   drawSprites();
   if (gameState === "play") {
+    pause.display()
     bgMusic.stop()
     e.visible = false
     e2.visible = false
@@ -86,9 +88,12 @@ function draw() {
       destroyPlayer(playerPlane2);
     }
     else if (p3) {
-      gameState = "end";
+      destroyPlayer(playerPlane3)
     }
-
+    else if (p4) {
+      destroyPlayer(playerPlane4)
+      gameState = "end"
+    }
     destroy(pBulletGroup, enemyGroup)
 
     if (p1) {
@@ -109,7 +114,20 @@ function draw() {
     textFont("Courier New");
     text("Score: " + score, 100, 50)
   }
-
+  if (gameState === "pause") {
+    enemyGroup.setVelocityEach(0)
+    eBulletGroup.setVelocityEach(0);
+    background.velocityY = 0
+    if (p1) {
+      playerPlane1.visible = false
+    }
+    else if (p2) {
+      playerPlane2.visible = false
+    }
+    else if (p3) {
+      playerPlane3.visible = false
+    }
+  }
   if (gameState === "end") {
     gameOver();
   }
@@ -236,7 +254,14 @@ function destroyPlayer(playerPlane) {
       playerPlane3.scale = 0.2;
 
     }
+    if (playerPlane === playerPlane3) {
+      p3 = false
+      p4 = true
+      playerPlane4 = createSprite(500, 400, 50, 50);
+      playerPlane4.addImage(playerImg)
+      playerPlane4.scale = 0.2;
 
+    }
   }
 }
 function gameOver() {
@@ -250,11 +275,12 @@ function gameOver() {
   textSize(50)
   fill("green")
   text(score, 800, 655)
-  playerPlane3.visible = false
+  playerPlane4.visible = false
   e2.visible = false
   e3.visible = false
   e4.visible = false
   p.visible = false
+  pause.hide()
 }
 function keyPressed() {
   if (keyCode === 32 && gameState === "play") {
