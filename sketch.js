@@ -7,41 +7,76 @@ var enemyGroup;
 var eBulletGroup, pBulletGroup;
 var chances = 2;
 var p1 = true, p2 = false, p3 = false
-var gameState = "play";
+var gameState = "start";
 var blast;
 var pbulletImg, eBulletImg;
 var score = 0;
 var blastSound, pBlastSound, bulletSound, eBulletSound;
 
 function preload() {
-  backImg = loadImage("images/space.jpg")
+  backImg = loadImage("images/back.png")
   playerImg = loadImage("images/player.png")
   pbulletImg = loadImage("images/pBullet1.jpg")
   ebulletImg = loadImage("images/eBullet1.jpg")
   enemyImg = loadImage("images/enemy1.png")
   blast = loadImage("images/blast1.png")
+
   blastSound = loadSound("sounds/blastSound.mp3")
   pBlastSound = loadSound("sounds/pBlast.mp3")
   bulletSound = loadSound("sounds/bulletSound.mp3")
   eBulletSound = loadSound("sounds/eBullet.mp3")
+  gameOverImg = loadImage("images/gameo.jpg")
+  bgMusic = loadSound("sounds/bgMusic.mp3")
 }
+
 function setup() {
-  createCanvas(1000, 600)
-  background = createSprite(500, 300);
+  createCanvas(windowWidth, windowHeight)
+  background = createSprite(windowWidth / 2, windowWidth / 2);
   background.addImage(backImg)
+
   playerPlane1 = createSprite(500, 400, 50, 50);
   playerPlane1.addImage(playerImg)
   playerPlane1.scale = 0.2
+
   enemyGroup = new Group();
   eBulletGroup = new Group();
   pBulletGroup = new Group();
-  playerPlane1.debug = true
+  e = createSprite(110, 100, 50, 50)
+  e.addImage(enemyImg)
+  e.scale = 0.19
+  e2 = createSprite(1310, 100, 50, 50)
+  e2.addImage(enemyImg)
+  e2.scale = 0.19
+  e3 = createSprite(110, 350, 50, 50)
+  e3.addImage(enemyImg)
+  e3.scale = 0.19
+  e4 = createSprite(1310, 350, 50, 50)
+  e4.addImage(enemyImg)
+  e4.scale = 0.19
+  p = createSprite(680, 600, 50, 50);
+  p.addImage(playerImg)
+  p.scale = 0.25
+
+  userInterface = new UserInterface()
+  userInterface.display()
 }
 function draw() {
+  if (gameState === "start") {
+    playerPlane1.visible = false
+    bgMusic.play()
+  }
   if (background.y > 400) {
     background.y = 300;
   }
+  drawSprites();
   if (gameState === "play") {
+    bgMusic.stop()
+    e.visible = false
+    e2.visible = false
+    e3.visible = false
+    e4.visible = false
+    p.visible = false
+    playerPlane1.visible = true
     background.velocityY = 1
     spawnEnemyPlane();
     if (p1) {
@@ -65,20 +100,20 @@ function draw() {
     else if (p3) {
       keyNavigation(playerPlane3)
     }
+    fill("white")
+    textSize(20)
+    textFont("Courier New");
+    text("Chances left: " + chances, 700, 50)
+    fill("white")
+    textSize(20)
+    textFont("Courier New");
+    text("Score: " + score, 100, 50)
   }
-  drawSprites();
+
   if (gameState === "end") {
     gameOver();
   }
 
-  fill("white")
-  textSize(20)
-  textFont("Courier New");
-  text("Chances left: " + chances, 700, 50)
-  fill("white")
-  textSize(20)
-  textFont("Courier New");
-  text("Score: " + score, 100, 50)
 }
 function spawnEnemyPlane() {
   if (World.frameCount % 40 === 0) {
@@ -101,8 +136,6 @@ function spawnEnemyPlane() {
     }
 
     enemyPlane.addImage(enemyImg)
-    enemyPlane.debug = true
-
     enemyPlane.scale = 0.1;
 
 
@@ -118,6 +151,7 @@ function destroy(group1, group2) {
   for (var i = 0; i < group2.length; i++) {
     if (group2.get(i).isTouching(group1)) {
       group2.get(i).addImage(blast)
+      group2.get(i).visible = false
       group1.destroyEach()
       score += 10
       blastSound.play()
@@ -131,7 +165,6 @@ function enemyBullet(rand) {
     eBullet = createSprite(1000, rand, 10, 10);
     eBullet.addImage(ebulletImg);
     eBullet.scale = 0.5;
-    eBullet.debug = true;
     eBulletSound.play()
 
     eBullet.velocityY = 5;
@@ -210,9 +243,18 @@ function gameOver() {
   enemyGroup.setVelocityEach(0)
   eBulletGroup.destroyEach();
   background.velocityY = 0
-  textSize(25)
-  fill("red")
-  text("Game Over", 200, 200)
+  background.x = windowWidth / 2
+  background.y = windowHeight / 2
+  background.addImage(gameOverImg)
+  background.scale = 2.4
+  textSize(50)
+  fill("green")
+  text(score, 800, 655)
+  playerPlane3.visible = false
+  e2.visible = false
+  e3.visible = false
+  e4.visible = false
+  p.visible = false
 }
 function keyPressed() {
   if (keyCode === 32 && gameState === "play") {
