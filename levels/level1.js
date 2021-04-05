@@ -2,6 +2,7 @@ var enemyPlane1, enemyPlane2, enemyPlane3, enemyPlane4, enemyPlane5
 var playerPlane, pBulletGroup
 var eBullet, eBulletGroup
 var score = 0
+var level2
 class Level1 {
     preload() {
         playerImg = loadImage("images/player.png")
